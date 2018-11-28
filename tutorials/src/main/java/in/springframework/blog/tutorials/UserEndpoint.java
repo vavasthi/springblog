@@ -14,23 +14,30 @@ public class UserEndpoint {
     @Autowired
     private UserRepository userRepository;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> getUser(@PathVariable("id") Long id) {
-        return userRepository.findById(id);
+    @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<User> getUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {
+        return retrieveUser(idOrUserNameOrEmail);
     }
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<User> getUser(@RequestBody User user) {
         return Optional.of(userRepository.save(user));
     }
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> deleteUser(@PathVariable("id") Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        userRepository.deleteById(id);
-        return optionalUser;
+    @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<User> deleteUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {
+        Optional<User> optionalUser = retrieveUser(idOrUserNameOrEmail);
+        if (optionalUser.isPresent()) {
+
+            userRepository.delete(optionalUser.get());
+            return optionalUser;
+        }
+        throw new EntityNotFoundException(String.format("%s user not found.", idOrUserNameOrEmail));
     }
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> patchUser(@PathVariable("id") Long id, @RequestBody User user) {
-        Optional<User> optionalUser = userRepository.findById(id);
+    @RequestMapping(value = "/{idOrUserNameOrEmail}",
+            method = RequestMethod.PATCH,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<User> patchUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail,
+                                    @RequestBody User user) {
+        Optional<User> optionalUser = retrieveUser(idOrUserNameOrEmail);
         if (optionalUser.isPresent()) {
             User storedUser = optionalUser.get();
             if (user.getEmail() != null) {
@@ -44,6 +51,25 @@ public class UserEndpoint {
             }
             return Optional.of(userRepository.save(storedUser));
         }
-        throw new EntityNotFoundException(String.format(String.format("User with id %d is not found", id)));
+        throw new EntityNotFoundException(String.format(String.format("User with id %s is not found", idOrUserNameOrEmail)));
+    }
+    private Optional<User> retrieveUser(String idOrUserNameOrEmail) {
+        try {
+
+            Long id = Long.parseLong(idOrUserNameOrEmail);
+            Optional<User> optionalUser = userRepository.findById(id);
+            if (optionalUser.isPresent()) {
+                return optionalUser;
+            }
+        }
+        catch(NumberFormatException e) {
+
+        }
+        Optional<User> optionalUser = userRepository.findUserByEmail(idOrUserNameOrEmail);
+        if (optionalUser.isPresent()) {
+            return optionalUser;
+        }
+        optionalUser = userRepository.findUserByUsername(idOrUserNameOrEmail);
+        return optionalUser;
     }
 }

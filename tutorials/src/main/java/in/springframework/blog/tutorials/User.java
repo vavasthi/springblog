@@ -3,7 +3,12 @@ package in.springframework.blog.tutorials;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user",
+        uniqueConstraints =
+          {
+             @UniqueConstraint(name = "uq_email", columnNames = {"email"}),
+             @UniqueConstraint(name = "uq_username", columnNames = {"username"})
+          })
 public class User {
 
     @Id
