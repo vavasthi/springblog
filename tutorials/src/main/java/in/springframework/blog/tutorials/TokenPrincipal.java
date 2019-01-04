@@ -9,11 +9,9 @@ import java.util.Optional;
 public class TokenPrincipal implements Principal {
 
 
-    public TokenPrincipal(Optional<String> token, Optional<String> tokenType, Optional<String> authorizationHeader) {
+    public TokenPrincipal(Optional<String> token) {
         this.name = (token.isPresent() ? token.get() : "None");
         this.token = token;
-        this.tokenType = tokenType;
-        this.authorizationHeader = authorizationHeader;
     }
 
     public Optional<String> getToken() {
@@ -33,24 +31,6 @@ public class TokenPrincipal implements Principal {
         return name;
     }
 
-    public Optional<String> getTokenType() {
-        return tokenType;
-    }
-
-    public void setTokenType(Optional<String> tokenType) {
-        this.tokenType = tokenType;
-    }
-
-    public Optional<String> getAuthorizationHeader() {
-        return authorizationHeader;
-    }
-
-    public void setAuthorizationHeader(Optional<String> authorizationHeader) {
-        this.authorizationHeader = authorizationHeader;
-    }
-
     private String name;
     private Optional<String> token;
-    private Optional<String> tokenType;
-    private Optional<String> authorizationHeader;
 }

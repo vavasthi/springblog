@@ -1,12 +1,14 @@
 package in.springframework.blog.tutorials;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "user",
         uniqueConstraints =
           {
              @UniqueConstraint(name = "uq_email", columnNames = {"email"}),
+                  @UniqueConstraint(name = "uq_authToken", columnNames = {"authToken"}),
              @UniqueConstraint(name = "uq_username", columnNames = {"username"})
           })
 public class User {
@@ -18,6 +20,9 @@ public class User {
     private String username;
     private String password;
     private String email;
+    private long mask;
+    private String authToken;
+    private Date expiry;
 
 
     public Long getId() {
@@ -58,5 +63,29 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public long getMask() {
+        return mask;
+    }
+
+    public void setMask(long mask) {
+        this.mask = mask;
+    }
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public Date getExpiry() {
+        return expiry;
+    }
+
+    public void setExpiry(Date expiry) {
+        this.expiry = expiry;
     }
 }

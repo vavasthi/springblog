@@ -29,6 +29,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(tokenAuthenticationProvider());
+        auth.authenticationProvider(usernamePasswordAuthenticationProvider());
     }
 
     @Override
@@ -37,6 +38,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/swagger-ui.html");
         web.ignoring().antMatchers("/webjars/**");
         web.ignoring().antMatchers("/v2/api-docs/**");
+        web.ignoring().antMatchers("/error");
         web.ignoring().antMatchers("/swagger-resources/**");
     }
 
@@ -46,11 +48,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).
                 and().
                 authorizeRequests().
-                antMatchers(actuatorEndpoints()).hasRole(Role.ADMIN.getValue()).
+                antMatchers(actuatorEndpoints()).hasAuthority(Role.ADMIN.name()).
                 anyRequest().authenticated().
                 and().
                 anonymous().disable().
-                exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
+                exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());;
 
         http.addFilterBefore(new AuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class);
     }
@@ -74,7 +76,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationProvider tokenAuthenticationProvider() {
-        return new SanjnanOAuthTokenAuthenticationProvider();
+        return new TokenAuthenticationProvider();
+    }
+    @Bean
+    public AuthenticationProvider usernamePasswordAuthenticationProvider() {
+        return new UsernamePasswordAuthenticationProvider();
     }
 
 }

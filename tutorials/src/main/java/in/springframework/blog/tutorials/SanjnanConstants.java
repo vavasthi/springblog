@@ -63,16 +63,7 @@ public class SanjnanConstants {
     public static final String MSG_SUCCESS = "Success!";
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SanjnanConstants.class);
-    //**************
-    private static final String API_PATH = "/api/v1";
-    public static final long ONE_DAY = 24 * 60 * 60 * 1000;
 
-    public static final int TOKEN_EXPIRY_SECONDS = 24 * 60 * 60;
-
-    public static final int S3_DELETE_RULE_BUFFER_DAYS = 1;
-    /**
-     * The constant MODEL_ALCATEL.
-     */
-    public static String MODEL_ALCATEL= "0113";
+    public static final String ANNOTATION_ROLE_USER = "hasAuthority('USER')"; // 0
 
 }

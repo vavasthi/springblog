@@ -5,13 +5,13 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class TokenAuthenticationProvider implements AuthenticationProvider {
 
@@ -23,28 +23,21 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         TokenPrincipal principal = (TokenPrincipal) authentication.getPrincipal();
-        try {
-
-            Request request = new Request.Builder()
-                    .url(String.format(requestUrl, principal.getToken().get()))
-                    .post(RequestBody.create(MediaType.get("application/x-www-form-urlencoded"), ""))
-                    .build();
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful()) {
-                Gson gson = new Gson();
-                OAuthResponse oAuthResponse = gson.fromJson(response.body().string(), OAuthResponse.class);
-                principal.setName(oAuthResponse.user_name);
-                List<H2ORole> authorityList = new ArrayList<>();
-                oAuthResponse.authorities.stream().forEach(e -> authorityList.add(new H2ORole(e)));
-                return new PreAuthenticatedAuthenticationToken(principal, principal.getToken(), authorityList);
+        Optional<User> userOptional = userRepository.findUserByAuthToken(principal.getName());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getExpiry() != null && user.getExpiry().after(new Date())) {
+                RequestContext.currentUser.set(user);
+                return new PreAuthenticatedAuthenticationToken(principal, null, UserAuthority.getAuthoritiesFromRoles(user.getMask()));
             }
             else {
 
-                throw new BadCredentialsException("Invalid token");
+                throw new BadCredentialsException(String.format("User %s doesn't exist.", principal.getName()));
             }
         }
-        catch(IOException ex) {
-            throw new BadCredentialsException("Communication failure with OAuth Server", ex);
+        else {
+
+            throw new BadCredentialsException(String.format("User %s doesn't exist.", principal.getName()));
         }
     }
     @Override

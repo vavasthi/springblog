@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,12 +54,19 @@ public class AuthenticationFilter extends GenericFilterBean {
         HttpServletResponse httpResponse = asHttp(response);
         try {
             HttpServletRequest httpRequest = asHttp(request);
+            if (httpRequest.getRequestURI().toString().equals("/authenticate") && httpRequest.getMethod().equals("POST")) {
 
-            Optional<String> token = getOptionalParameter(httpRequest,"token");
-            Optional<String> tokenType = getOptionalParameter(httpRequest,"token");
-            Optional<String> authorizationHeader = Optional.of(httpRequest.getHeader("Authorization"));
-            TokenPrincipal authTokenPrincipal = new TokenPrincipal(token, tokenType, authorizationHeader);
-            processTokenAuthentication(authTokenPrincipal);
+                Optional<String> username = getOptionalHeader(httpRequest,"username");
+                Optional<String> password = getOptionalHeader(httpRequest,"password");
+                UsernamePasswordPrincipal usernamePasswordPrincipal = new UsernamePasswordPrincipal(username, password);
+                processUsernameAuthentication(usernamePasswordPrincipal);
+            }
+            else {
+
+                Optional<String> token = getOptionalHeader(httpRequest,"token");
+                TokenPrincipal authTokenPrincipal = new TokenPrincipal(token);
+                processTokenAuthentication(authTokenPrincipal);
+            }
             chain.doFilter(request, response);
         } catch (InternalAuthenticationServiceException e) {
             SecurityContextHolder.clearContext();
@@ -81,6 +89,18 @@ public class AuthenticationFilter extends GenericFilterBean {
 
     private HttpServletResponse asHttp(ServletResponse response) {
         return (HttpServletResponse) response;
+    }
+
+    private void processUsernameAuthentication(UsernamePasswordPrincipal usernamePasswordPrincipal) {
+
+        Authentication resultOfAuthentication = tryToAuthenticateWithUsername(usernamePasswordPrincipal);
+        SecurityContextHolder.getContext().setAuthentication(resultOfAuthentication);
+    }
+
+    private Authentication tryToAuthenticateWithUsername(UsernamePasswordPrincipal usernamePasswordPrincipal) {
+        UsernamePasswordAuthenticationToken requestAuthentication
+                = new UsernamePasswordAuthenticationToken(usernamePasswordPrincipal, usernamePasswordPrincipal.getPassword());
+        return tryToAuthenticate(requestAuthentication);
     }
 
     private void processTokenAuthentication(TokenPrincipal tokenPrincipal) {
@@ -154,5 +174,8 @@ public class AuthenticationFilter extends GenericFilterBean {
             return Optional.of((String)null);
         }
         return Optional.of(values[0]);
+    }
+    private Optional<String> getOptionalHeader(HttpServletRequest httpRequest, String headerName) {
+        return Optional.of(httpRequest.getHeader(headerName));
     }
 }

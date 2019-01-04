@@ -1,39 +1,28 @@
 package in.springframework.blog.tutorials;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public enum Role {
-    USER("user"), // 0 User
-    TESTER("tester"), // 1 Tester
-    ADMIN("admin"), // 2 Admin
-    SUPERADMIN("superadmin"), //3 Super Admin
-    DEVICE("device"), // 4
-    REFRESH("refresh"); // 5 Only for internal use for refresh token.
+    USER(0x01), // 0 User
+    TESTER(0x01 << 1), // 1 Tester
+    ADMIN(0x01 << 2), // 2 Admin
+    REFRESH(0x01 << 3),
+    ANONYMOUS(0x01 << 4); // 5 Only for internal use for refresh token.
 
-    private final String value;
-    private final String role;
+    private final int mask;
 
-    Role(String value) {
-        this.value = value;
-        this.role = "\"hasRole('" + value + "')\")";
+    Role(int mask) {
+        this.mask = mask;
     }
 
-    public static Role createFromString(String value) {
-        for (Role r : Role.values()) {
-            if (r.value.equalsIgnoreCase(value)) {
-                return r;
+    public static Set<Role> createFromMask(long mask) {
+        Set<Role> output = new HashSet<>();
+        for (Role r : values()) {
+            if ((r.mask & mask) != 0) {
+                output.add(r);
             }
         }
-        throw new IllegalArgumentException(value + " is not a valid value");
-    }
-
-    public final String getValue() {
-        return value;
-    }
-
-    public final String getRole() {
-        return role;
-    }
-
-    public final String getRoleAnnotation() {
-        return "hasRole('" + value + "')";
+        return output;
     }
 }
