@@ -14,7 +14,7 @@ public class AuthenticateEndpoint {
     @Autowired
     private UserRepository userRepository;
 
-    @PreAuthorize(SanjnanConstants.ANNOTATION_ROLE_USER)
+    @PreAuthorize(MyConstants.ANNOTATION_ROLE_USER)
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponse login(@RequestBody LoginRequest loginRequest) {
         User user = RequestContext.currentUser.get();

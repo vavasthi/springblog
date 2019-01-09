@@ -59,13 +59,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private String[] actuatorEndpoints() {
         return new String[]{
-                SanjnanConstants.AUTOCONFIG_ENDPOINT,
-                SanjnanConstants.BEANS_ENDPOINT,
-                SanjnanConstants.CONFIGPROPS_ENDPOINT,
-                SanjnanConstants.ENV_ENDPOINT,
-                SanjnanConstants.MAPPINGS_ENDPOINT,
-                SanjnanConstants.METRICS_ENDPOINT,
-                SanjnanConstants.SHUTDOWN_ENDPOINT
+                MyConstants.AUTOCONFIG_ENDPOINT,
+                MyConstants.BEANS_ENDPOINT,
+                MyConstants.CONFIGPROPS_ENDPOINT,
+                MyConstants.ENV_ENDPOINT,
+                MyConstants.MAPPINGS_ENDPOINT,
+                MyConstants.METRICS_ENDPOINT,
+                MyConstants.SHUTDOWN_ENDPOINT
         };
     }
 

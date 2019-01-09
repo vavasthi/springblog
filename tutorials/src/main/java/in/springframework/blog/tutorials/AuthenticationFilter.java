@@ -148,7 +148,7 @@ public class AuthenticationFilter extends GenericFilterBean {
                 .setStatus(status)
                 .setCode(errorCode)
                 .setMessage(e.getMessage())
-                .setMoreInfo(String.format(SanjnanConstants.EXCEPTION_URL,errorCode))
+                .setMoreInfo(String.format(MyConstants.EXCEPTION_URL,errorCode))
                 .createExceptionResponse();
         response.setStatus(status);
         Gson gson = new Gson();

@@ -19,7 +19,7 @@ public abstract class AbstractResponse {
     /**
      * The Message.
      */
-    String message = SanjnanConstants.MSG_SUCCESS;
+    String message = MyConstants.MSG_SUCCESS;
     /**
      * The More info.
      */
