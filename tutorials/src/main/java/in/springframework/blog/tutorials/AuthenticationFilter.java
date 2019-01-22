@@ -54,7 +54,13 @@ public class AuthenticationFilter extends GenericFilterBean {
         HttpServletResponse httpResponse = asHttp(response);
         try {
             HttpServletRequest httpRequest = asHttp(request);
-            if (httpRequest.getRequestURI().toString().equals("/authenticate") && httpRequest.getMethod().equals("POST")) {
+            if (httpRequest.getRequestURI().toString().equals("/user") && httpRequest.getMethod().equals("POST")) {
+
+                Optional<String> username = getOptionalHeader(httpRequest,"username");
+                UsernamePasswordPrincipal usernamePasswordPrincipal = new UsernamePasswordPrincipal(username, username, true);
+                processUsernameAuthentication(usernamePasswordPrincipal);
+            }
+            else if (httpRequest.getRequestURI().toString().equals("/authenticate") && httpRequest.getMethod().equals("POST")) {
 
                 Optional<String> username = getOptionalHeader(httpRequest,"username");
                 Optional<String> password = getOptionalHeader(httpRequest,"password");

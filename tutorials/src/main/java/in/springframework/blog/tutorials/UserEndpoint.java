@@ -2,9 +2,12 @@ package in.springframework.blog.tutorials;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -14,13 +17,24 @@ public class UserEndpoint {
     @Autowired
     private UserRepository userRepository;
 
+
+    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostFilter("hasRole('ADMIN') or filterObject.username == authentication.name")
+    public Iterable<User> getUsers() {
+        return userRepository.findAll();
+    }
+
     @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<User> getUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {
         return retrieveUser(idOrUserNameOrEmail);
     }
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> getUser(@RequestBody User user) {
-        return Optional.of(userRepository.save(user));
+    @PreAuthorize(MyConstants.ANNOTATION_ROLE_NEWUSER)
+    public Optional<User> createUser(@RequestHeader(value="username") String username, @RequestBody User user) {
+        user.setMask(Role.USER.ordinal());
+        User storedUser = userRepository.save(user);
+        storedUser.setPassword(null);
+        return Optional.of(storedUser);
     }
     @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<User> deleteUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {

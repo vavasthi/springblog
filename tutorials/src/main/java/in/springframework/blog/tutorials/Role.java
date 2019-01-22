@@ -8,7 +8,8 @@ public enum Role {
     TESTER(0x01 << 1), // 1 Tester
     ADMIN(0x01 << 2), // 2 Admin
     REFRESH(0x01 << 3),
-    ANONYMOUS(0x01 << 4); // 5 Only for internal use for refresh token.
+    ANONYMOUS(0x01 << 4),
+    NEWUSER(0x01 << 5);
 
     private final int mask;
 

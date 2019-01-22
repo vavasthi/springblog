@@ -16,7 +16,9 @@ public class AuthenticateEndpoint {
 
     @PreAuthorize(MyConstants.ANNOTATION_ROLE_USER)
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+    public LoginResponse login(@RequestHeader(value="username") String username,
+                               @RequestHeader(value="password") String password,
+                               @RequestBody LoginRequest loginRequest) {
         User user = RequestContext.currentUser.get();
         return new LoginResponse(user.getAuthToken(), user.getExpiry());
     }

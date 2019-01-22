@@ -9,10 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 import javax.transaction.Transactional;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
 
@@ -25,27 +22,38 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
     @Transactional
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         UsernamePasswordPrincipal principal = (UsernamePasswordPrincipal) authentication.getPrincipal();
-        Optional<User> userOptional = userRepository.findUserByEmailOrUsername(principal.getName());
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            if (PasswordManager.INSTANCE.matches(principal.getPassword(), user.getPassword())) {
-                user = userRepository.findById(user.getId()).get();
-                user.setAuthToken(UUID.randomUUID().toString() + "-" + UUID.randomUUID());
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(new Date());
-                calendar.add(Calendar.HOUR, 24);
-                user.setExpiry(calendar.getTime());
-                RequestContext.currentUser.set(user);
-                return new UsernamePasswordAuthenticationToken(principal, null, UserAuthority.getAuthoritiesFromRoles(user.getMask()));
+        if (principal.isNewUser()) {
+
+            if (userRepository.findUserByEmailOrUsername(principal.getName()).isPresent()) {
+                throw new EntityAlreadyExistsException(String.format("Username %s already exists.", principal.getName()));
+            }
+            List<Role> roles = Arrays.asList(Role.NEWUSER);
+            return new UsernamePasswordAuthenticationToken(principal, null, UserAuthority.getAuthoritiesFromRoles(roles));
+        }
+        else {
+
+            Optional<User> userOptional = userRepository.findUserByEmailOrUsername(principal.getName());
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                if (PasswordManager.INSTANCE.matches(principal.getPassword(), user.getPassword())) {
+                    user = userRepository.findById(user.getId()).get();
+                    user.setAuthToken(UUID.randomUUID().toString() + "-" + UUID.randomUUID());
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(new Date());
+                    calendar.add(Calendar.HOUR, 24);
+                    user.setExpiry(calendar.getTime());
+                    RequestContext.currentUser.set(user);
+                    return new UsernamePasswordAuthenticationToken(principal, null, UserAuthority.getAuthoritiesFromRoles(user.getMask()));
+                }
+                else {
+
+                    throw new BadCredentialsException(String.format("User %s doesn't exist.", principal.getName()));
+                }
             }
             else {
 
                 throw new BadCredentialsException(String.format("User %s doesn't exist.", principal.getName()));
             }
-        }
-        else {
-
-            throw new BadCredentialsException(String.format("User %s doesn't exist.", principal.getName()));
         }
     }
     @Override

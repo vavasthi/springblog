@@ -40,6 +40,7 @@ public class MyConstants {
      */
     public static final String MSG_SUCCESS = "Success!";
 
-    public static final String ANNOTATION_ROLE_USER = "hasAuthority('USER')"; // 0
+    public static final String ANNOTATION_ROLE_USER = "hasAuthority('USER')";
+   public static final String ANNOTATION_ROLE_NEWUSER = "hasAuthority('NEWUSER')";
 
 }
