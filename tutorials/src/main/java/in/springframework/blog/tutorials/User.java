@@ -7,9 +7,9 @@ import java.util.Date;
 @Table(name = "user",
         uniqueConstraints =
           {
-             @UniqueConstraint(name = "uq_email", columnNames = {"email"}),
+                  @UniqueConstraint(name = "uq_email", columnNames = {"email"}),
                   @UniqueConstraint(name = "uq_authToken", columnNames = {"authToken"}),
-             @UniqueConstraint(name = "uq_username", columnNames = {"username"})
+                  @UniqueConstraint(name = "uq_username", columnNames = {"username"})
           })
 public class User {
 

@@ -14,7 +14,6 @@ public class AuthenticateEndpoint {
     @Autowired
     private UserRepository userRepository;
 
-    @PreAuthorize(MyConstants.ANNOTATION_ROLE_USER)
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public LoginResponse login(@RequestHeader(value="username") String username,
                                @RequestHeader(value="password") String password,

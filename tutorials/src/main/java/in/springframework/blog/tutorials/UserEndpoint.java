@@ -1,9 +1,12 @@
 package in.springframework.blog.tutorials;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -17,11 +20,15 @@ public class UserEndpoint {
     @Autowired
     private UserRepository userRepository;
 
+    Logger logger = LogManager.getLogger(UserEndpoint.class);
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostFilter("hasRole('ADMIN') or filterObject.username == authentication.name")
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostFilter("hasAuthority('ADMIN') or filterObject.authToken == authentication.name")
     public Iterable<User> getUsers() {
-        return userRepository.findAll();
+      logger.error(SecurityContextHolder.getContext().getAuthentication().getName());
+      logger.error(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        Iterable<User> users = userRepository.findAll();
+        return users;
     }
 
     @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
