@@ -1,4 +1,4 @@
-package in.springframework.blog.tutorials;
+package in.springframework.blog.tutorials.user.domain;
 
 import javax.persistence.*;
 import java.util.Date;

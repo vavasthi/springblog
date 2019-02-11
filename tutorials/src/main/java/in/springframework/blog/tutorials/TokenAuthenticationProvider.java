@@ -1,16 +1,15 @@
 package in.springframework.blog.tutorials;
 
-import com.google.gson.Gson;
+import in.springframework.blog.tutorials.user.domain.User;
+import in.springframework.blog.tutorials.user.repository.UserRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-import java.io.IOException;
 import java.util.*;
 
 public class TokenAuthenticationProvider implements AuthenticationProvider {
