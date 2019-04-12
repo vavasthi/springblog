@@ -33,7 +33,7 @@ public class MyTopicMessageSenderEndpoint {
 
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(MyConstants.ANNOTATION_ROLE_USER)
-    public String createUser(@RequestBody MyTopicMessage message) {
+    public String sendMessage(@RequestBody MyTopicMessage message) {
 
         switch(message.getTopicName()) {
             case FirstTopic:
