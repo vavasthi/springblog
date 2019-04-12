@@ -15,11 +15,11 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-public class FirstTopicConsumerConfig {
+public class SecondTopicConsumerConfig {
 
-  @Value("${spring.kafka.topic1.bootstrap-servers:localhost}")
+  @Value("${spring.kafka.topic2.bootstrap-servers:localhost}")
   private String bootstrapAddress;
-  @Value("${spring.kafka.topic1.group-id:firstgroup}")
+  @Value("${spring.kafka.topic2.group-id:secondgroup}")
   private String groupId;
 
   public ConsumerFactory<String, String> consumerFactory() {
@@ -39,7 +39,7 @@ public class FirstTopicConsumerConfig {
     return new DefaultKafkaConsumerFactory<>(props);
   }
 
-  @Bean(name="firstTopicListenerContainerFactory")
+  @Bean(name="secondTopicListenerContainerFactory")
   public ConcurrentKafkaListenerContainerFactory<String, String>
   kafkaListenerContainerFactory() {
 
