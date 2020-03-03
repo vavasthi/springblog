@@ -41,10 +41,7 @@ public class HelloWorldJettyCustomizer {
                 if (!logFile.getParentFile().exists() && !logFile.getParentFile().mkdirs()) {
                     throw new LoggingException(String.format("%s could not be created.", logFile.getParentFile().getAbsolutePath()));
                 }
-                NCSARequestLog requestLog = new NCSARequestLog(logFilename);
-                requestLog.setAppend(true);
-                requestLog.setExtended(false);
-                requestLog.setLogTimeZone("UTC");
+                CustomRequestLog requestLog = new CustomRequestLog(logFilename);
                 RequestLogHandler rlh = new RequestLogHandler();
                 rlh.setRequestLog(requestLog);
                 Handler[] handlers = server.getHandlers();

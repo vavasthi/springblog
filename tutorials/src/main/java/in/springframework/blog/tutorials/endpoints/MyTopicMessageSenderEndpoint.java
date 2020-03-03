@@ -4,8 +4,9 @@ import in.springframework.blog.tutorials.Constants;
 import in.springframework.blog.tutorials.MyConstants;
 import in.springframework.blog.tutorials.pojos.MyTopicMessage;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ public class MyTopicMessageSenderEndpoint {
     @Qualifier(Constants.SECOND_TOPIC_TEMPLATE_NAME)
     private KafkaTemplate secondKafkaTemplate;
 
-    Logger logger = Logger.getLogger(MyTopicMessageSenderEndpoint.class);
+    Logger logger = LogManager.getLogger(MyTopicMessageSenderEndpoint.class);
 
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(MyConstants.ANNOTATION_ROLE_USER)

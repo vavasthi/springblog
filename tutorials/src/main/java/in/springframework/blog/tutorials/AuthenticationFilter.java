@@ -1,8 +1,9 @@
 package in.springframework.blog.tutorials;
 
 import com.google.gson.Gson;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,7 +31,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 
     public static final String TOKEN_SESSION_KEY = "token";
     public static final String USER_SESSION_KEY = "user";
-    private final static Logger logger = Logger.getLogger(AuthenticationFilter.class);
+    private final static Logger logger = LogManager.getLogger(AuthenticationFilter.class);
     private AuthenticationManager authenticationManager;
 
     public AuthenticationFilter(AuthenticationManager authenticationManager) {

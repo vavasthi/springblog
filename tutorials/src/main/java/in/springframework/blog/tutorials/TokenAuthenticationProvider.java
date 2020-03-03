@@ -2,7 +2,8 @@ package in.springframework.blog.tutorials;
 
 import in.springframework.blog.tutorials.user.domain.User;
 import in.springframework.blog.tutorials.user.repository.UserRepository;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,7 +15,7 @@ import java.util.*;
 
 public class TokenAuthenticationProvider implements AuthenticationProvider {
 
-    private final static Logger logger = Logger.getLogger(TokenAuthenticationProvider.class);
+    private final static Logger logger = LogManager.getLogger(TokenAuthenticationProvider.class);
 
     @Autowired
     private UserRepository userRepository;
