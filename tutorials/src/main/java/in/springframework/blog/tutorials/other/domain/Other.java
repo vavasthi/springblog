@@ -1,11 +1,13 @@
 package in.springframework.blog.tutorials.other.domain;
 
+import in.springframework.blog.tutorials.user.domain.AbstractBaseEntity;
+
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "other")
-public class Other {
+public class Other extends AbstractBaseEntity {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)

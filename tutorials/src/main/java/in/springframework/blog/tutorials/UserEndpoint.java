@@ -2,8 +2,8 @@ package in.springframework.blog.tutorials;
 
 import in.springframework.blog.tutorials.user.domain.User;
 import in.springframework.blog.tutorials.user.repository.UserRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PostFilter;
@@ -14,42 +14,42 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
+@Log4j2
 @RestController
 @RequestMapping("/user")
 public class UserEndpoint {
 
     @Autowired
-    private UserRepository userRepository;
-
-    Logger logger = LogManager.getLogger(UserEndpoint.class);
+    private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @PostFilter("hasAuthority('ADMIN') or filterObject.authToken == authentication.name")
     public Iterable<User> getUsers() {
-      logger.error(SecurityContextHolder.getContext().getAuthentication().getName());
-      logger.error(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        Iterable<User> users = userRepository.findAll();
+      log.error(SecurityContextHolder.getContext().getAuthentication().getName());
+      log.error(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        Iterable<User> users = userService.findAll();
         return users;
     }
 
     @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<User> getUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {
-        return retrieveUser(idOrUserNameOrEmail);
+        return userService.retrieveUser(idOrUserNameOrEmail);
     }
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(MyConstants.ANNOTATION_ROLE_NEWUSER)
     public Optional<User> createUser(@RequestHeader(value="username") String username, @RequestBody User user) {
         user.setMask(Role.USER.ordinal());
-        User storedUser = userRepository.save(user);
+        user.setUsername(username);
+        User storedUser = userService.save(user);
         storedUser.setPassword(null);
         return Optional.of(storedUser);
     }
     @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<User> deleteUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {
-        Optional<User> optionalUser = retrieveUser(idOrUserNameOrEmail);
+        Optional<User> optionalUser = userService.retrieveUser(idOrUserNameOrEmail);
         if (optionalUser.isPresent()) {
 
-            userRepository.delete(optionalUser.get());
+            userService.delete(optionalUser.get());
             return optionalUser;
         }
         throw new EntityNotFoundException(String.format("%s user not found.", idOrUserNameOrEmail));
@@ -59,7 +59,7 @@ public class UserEndpoint {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<User> patchUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail,
                                     @RequestBody User user) {
-        Optional<User> optionalUser = retrieveUser(idOrUserNameOrEmail);
+        Optional<User> optionalUser = userService.retrieveUser(idOrUserNameOrEmail);
         if (optionalUser.isPresent()) {
             User storedUser = optionalUser.get();
             if (user.getEmail() != null) {
@@ -71,27 +71,8 @@ public class UserEndpoint {
             if (user.getPassword() != null) {
                 storedUser.setPassword(user.getPassword());
             }
-            return Optional.of(userRepository.save(storedUser));
+            return Optional.of(userService.save(storedUser));
         }
         throw new EntityNotFoundException(String.format(String.format("User with id %s is not found", idOrUserNameOrEmail)));
-    }
-    private Optional<User> retrieveUser(String idOrUserNameOrEmail) {
-        try {
-
-            Long id = Long.parseLong(idOrUserNameOrEmail);
-            Optional<User> optionalUser = userRepository.findById(id);
-            if (optionalUser.isPresent()) {
-                return optionalUser;
-            }
-        }
-        catch(NumberFormatException e) {
-
-        }
-        Optional<User> optionalUser = userRepository.findUserByEmail(idOrUserNameOrEmail);
-        if (optionalUser.isPresent()) {
-            return optionalUser;
-        }
-        optionalUser = userRepository.findUserByUsername(idOrUserNameOrEmail);
-        return optionalUser;
     }
 }

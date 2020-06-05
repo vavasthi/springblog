@@ -1,8 +1,7 @@
 package in.springframework.blog.tutorials;
 
 import com.google.gson.Gson;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
+import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,11 +26,11 @@ import java.util.Optional;
 /**
  * Created by vinay on 2/3/16.
  */
+@Log4j2
 public class AuthenticationFilter extends GenericFilterBean {
 
     public static final String TOKEN_SESSION_KEY = "token";
     public static final String USER_SESSION_KEY = "user";
-    private final static Logger logger = LogManager.getLogger(AuthenticationFilter.class);
     private AuthenticationManager authenticationManager;
 
     public AuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -144,7 +143,7 @@ public class AuthenticationFilter extends GenericFilterBean {
             }
         }
         catch(Exception jsonex) {
-            logger.log(Level.ERROR, "Error during error generation", jsonex);
+            logger.error("Error during error generation", jsonex);
         }
     }
 
