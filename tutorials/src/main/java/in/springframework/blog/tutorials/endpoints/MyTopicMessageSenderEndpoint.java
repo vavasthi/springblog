@@ -3,9 +3,7 @@ package in.springframework.blog.tutorials.endpoints;
 import in.springframework.blog.tutorials.Constants;
 import in.springframework.blog.tutorials.MyConstants;
 import in.springframework.blog.tutorials.pojos.MyTopicMessage;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+@Log4j2
 @RestController
 @RequestMapping("/send")
 public class MyTopicMessageSenderEndpoint {
@@ -29,8 +28,6 @@ public class MyTopicMessageSenderEndpoint {
     @Qualifier(Constants.SECOND_TOPIC_TEMPLATE_NAME)
     private KafkaTemplate secondKafkaTemplate;
 
-    Logger logger = Logger.getLogger(MyTopicMessageSenderEndpoint.class);
-
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(MyConstants.ANNOTATION_ROLE_USER)
     public String sendMessage(@RequestBody MyTopicMessage message) {
@@ -41,13 +38,13 @@ public class MyTopicMessageSenderEndpoint {
                     @Override
                     public void onFailure(Throwable throwable) {
 
-                        logger.log(Level.INFO, String.format("Message '%s' failed!", message.getMessage()));
+                        log.info(String.format("Message '%s' failed!", message.getMessage()));
                     }
 
                     @Override
                     public void onSuccess(Object o) {
 
-                        logger.log(Level.INFO, String.format("Message '%s' sent successfully!", message.getMessage()));
+                        log.info(String.format("Message '%s' sent successfully!", message.getMessage()));
                     }
                 });
                 break;
@@ -56,13 +53,13 @@ public class MyTopicMessageSenderEndpoint {
                     @Override
                     public void onFailure(Throwable throwable) {
 
-                        logger.log(Level.INFO, String.format("Message '%s' failed!", message.getMessage()));
+                        log.info(String.format("Message '%s' failed!", message.getMessage()));
                     }
 
                     @Override
                     public void onSuccess(Object o) {
 
-                        logger.log(Level.INFO, String.format("Message '%s' sent successfully!", message.getMessage()));
+                        log.info(String.format("Message '%s' sent successfully!", message.getMessage()));
                     }
                 });
                 break;

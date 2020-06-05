@@ -2,7 +2,7 @@ package in.springframework.blog.tutorials;
 
 import in.springframework.blog.tutorials.user.domain.User;
 import in.springframework.blog.tutorials.user.repository.UserRepository;
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,9 +13,8 @@ import org.springframework.security.core.AuthenticationException;
 import javax.transaction.Transactional;
 import java.util.*;
 
+@Log4j2
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
-
-    private final static Logger logger = Logger.getLogger(UsernamePasswordAuthenticationProvider.class);
 
     @Autowired
     private UserRepository userRepository;
