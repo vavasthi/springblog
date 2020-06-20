@@ -1,0 +1,48 @@
+package in.springframework.blog.tutorials.providers;
+
+import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.principals.TokenPrincipal;
+import in.springframework.blog.tutorials.pojos.UserAuthority;
+import in.springframework.blog.tutorials.entities.User;
+import in.springframework.blog.tutorials.repositories.UserRepository;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+
+import java.util.*;
+
+@Log4j2
+public class TokenAuthenticationProvider implements AuthenticationProvider {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        TokenPrincipal principal = (TokenPrincipal) authentication.getPrincipal();
+        Optional<User> userOptional = userRepository.findUserByAuthToken(principal.getName());
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (user.getExpiry() != null && user.getExpiry().after(new Date())) {
+                RequestContext.currentUser.set(user);
+                return new PreAuthenticatedAuthenticationToken(principal, null, UserAuthority.getAuthoritiesFromRoles(user.getMask()));
+            }
+            else {
+
+                throw new BadCredentialsException(String.format("User %s doesn't exist.", principal.getName()));
+            }
+        }
+        else {
+
+            throw new BadCredentialsException(String.format("User %s doesn't exist.", principal.getName()));
+        }
+    }
+    @Override
+    public boolean supports(Class<?> authentication) {
+        return authentication.equals(PreAuthenticatedAuthenticationToken.class);
+    }
+}

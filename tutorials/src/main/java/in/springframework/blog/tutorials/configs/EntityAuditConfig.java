@@ -1,7 +1,6 @@
 package in.springframework.blog.tutorials.configs;
 
-import in.springframework.blog.tutorials.RequestContext;
-import in.springframework.blog.tutorials.user.domain.User;
+import in.springframework.blog.tutorials.utils.RequestContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -18,7 +17,12 @@ public class EntityAuditConfig {
 
       @Override
       public Optional<Long> getCurrentAuditor() {
+        if (RequestContext.currentUser.get() != null) {
           return Optional.of(RequestContext.currentUser.get().getId());
+        }
+        else {
+          return Optional.of(-1L);
+        }
       }
     };
   }
