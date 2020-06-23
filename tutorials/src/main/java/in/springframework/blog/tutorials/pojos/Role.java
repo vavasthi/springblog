@@ -7,11 +7,16 @@ public enum Role {
     USER(0x01), // 0 User
     TESTER(0x01 << 1), // 1 Tester
     ADMIN(0x01 << 2), // 2 Admin
-    REFRESH(0x01 << 3),
-    ANONYMOUS(0x01 << 4),
-    NEWUSER(0x01 << 5);
+    TENANT_ADMIN(0x01 << 3),
+    REFRESH(0x01 << 4),
+    ANONYMOUS(0x01 << 5),
+    NEWUSER(0x01 << 6);
 
     private final int mask;
+
+    public int getMask() {
+        return mask;
+    }
 
     Role(int mask) {
         this.mask = mask;

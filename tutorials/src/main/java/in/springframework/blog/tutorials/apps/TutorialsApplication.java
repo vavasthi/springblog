@@ -9,9 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"in.springframework.blog.tutorials",
-				"in.springframework.blog.tutorials.configs",
-				"in.springframework.blog.tutorials.repositories"})
+@ComponentScan(basePackages = {"in.springframework.blog.tutorials"})
 @EnableAutoConfiguration
 @EnableResourceServer
 public class TutorialsApplication {
@@ -22,4 +20,5 @@ public class TutorialsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TutorialsApplication.class, args);
 	}
+
 }

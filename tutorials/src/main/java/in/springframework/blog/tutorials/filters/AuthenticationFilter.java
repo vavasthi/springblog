@@ -1,13 +1,10 @@
 package in.springframework.blog.tutorials.filters;
 
 import com.google.gson.Gson;
-import in.springframework.blog.tutorials.entities.Tenant;
-import in.springframework.blog.tutorials.entities.User;
 import in.springframework.blog.tutorials.exceptions.*;
 import in.springframework.blog.tutorials.principals.TokenPrincipal;
 import in.springframework.blog.tutorials.principals.UsernamePasswordPrincipal;
 import in.springframework.blog.tutorials.utils.MyConstants;
-import in.springframework.blog.tutorials.utils.RequestContext;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,7 +12,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.filter.GenericFilterBean;
@@ -27,7 +23,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Created by vinay on 2/3/16.
@@ -57,7 +52,7 @@ public class AuthenticationFilter extends GenericFilterBean {
                          ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
 
-        HttpServletResponse httpResponse = asHttp(response);
+/*        HttpServletResponse httpResponse = asHttp(response);
         try {
             HttpServletRequest httpRequest = asHttp(request);
             User user = RequestContext.currentUser.get();
@@ -93,7 +88,7 @@ public class AuthenticationFilter extends GenericFilterBean {
             handleExceptions(e, asHttp(response));
         }
         finally {
-        }
+        }*/
     }
 
     private HttpServletRequest asHttp(ServletRequest request) {

@@ -1,87 +1,93 @@
 package in.springframework.blog.tutorials.endpoints;
 
+import in.springframework.blog.tutorials.annotations.AdminTenantAdminAllOrCurrentUserListPermission;
+import in.springframework.blog.tutorials.annotations.AdminTenantAdminOrCurrentUserBodyPermission;
+import in.springframework.blog.tutorials.annotations.AdminTenantAdminOrCurrentUserPermission;
 import in.springframework.blog.tutorials.entities.User;
-import in.springframework.blog.tutorials.pojos.Role;
+import in.springframework.blog.tutorials.mappers.UserPojoMapper;
 import in.springframework.blog.tutorials.pojos.UserChangePassword;
+import in.springframework.blog.tutorials.pojos.UserPojo;
 import in.springframework.blog.tutorials.services.UserService;
-import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.utils.MyConstants;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PostFilter;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 @Log4j2
 @RestController
-@RequestMapping("/user")
+@RequestMapping(MyConstants.USER_ENDPOINT)
 public class UserEndpoint {
 
     @Autowired
     private UserService userService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserPojoMapper userToPojoMapper;
+
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PostFilter("hasAuthority('ADMIN') or filterObject.authToken == authentication.name")
-    public Iterable<User> getUsers() {
-      log.error(SecurityContextHolder.getContext().getAuthentication().getName());
-      log.error(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+    @AdminTenantAdminAllOrCurrentUserListPermission
+    public Iterable<UserPojo> getUsers() {
         Iterable<User> users = userService.findAll();
-        return users;
+        final Set<UserPojo> pojoSet = new HashSet<>();
+        users.forEach(new Consumer<User>() {
+            @Override
+            public void accept(User user) {
+                pojoSet.add(userToPojoMapper.convert(user));
+            }
+        });
+        return pojoSet;
     }
 
-    @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> getUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {
-        return userService.retrieveUser(idOrUserNameOrEmail);
+    @RequestMapping(value = "/{username}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @AdminTenantAdminOrCurrentUserPermission
+    public Optional<UserPojo> getUser(@PathVariable("username") String username) {
+        return userToPojoMapper.convert(userService.retrieveUser(username));
     }
-    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-   // @PreAuthorize(MyConstants.ANNOTATION_ROLE_NEWUSER)
-    public Optional<User> createUser(@RequestHeader(value="username") String username, @RequestBody User user) {
-        user.setMask(Role.USER.ordinal());
-        user.setUsername(username);
-        user.setTenant(RequestContext.currentTenant.get());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User storedUser = userService.save(user);
-        storedUser.setPassword(null);
-        return Optional.of(storedUser);
-    }
-    @RequestMapping(value = "/{idOrUserNameOrEmail}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> deleteUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail) {
-        Optional<User> optionalUser = userService.retrieveUser(idOrUserNameOrEmail);
+    @RequestMapping(value = "/{username}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @AdminTenantAdminOrCurrentUserPermission
+    public Optional<UserPojo> deleteUser(@PathVariable("username") String username) {
+        Optional<User> optionalUser = userService.retrieveUser(username);
         if (optionalUser.isPresent()) {
 
-            userService.delete(optionalUser.get());
-            return optionalUser;
+            userService.delete(optionalUser.get().getId());
+            return Optional.of(userToPojoMapper.convert(optionalUser.get()));
         }
-        throw new EntityNotFoundException(String.format("%s user not found.", idOrUserNameOrEmail));
+        throw new EntityNotFoundException(String.format("%s user not found.", username));
     }
-    @RequestMapping(value = "/changePassword/{idOrUserNameOrEmail}",
+    @RequestMapping(value = "/changePassword/{username}",
             method = RequestMethod.PATCH,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> changePassword(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail,
-                                         @RequestBody UserChangePassword ucp) {
-        Optional<User> optionalUser = userService.retrieveUser(idOrUserNameOrEmail);
+    @AdminTenantAdminOrCurrentUserPermission
+    public Optional<UserPojo> changePassword(@PathVariable("username") String username,
+                                             @RequestBody UserChangePassword user) {
+        Optional<User> optionalUser = userService.retrieveUser(username);
         if (optionalUser.isPresent()) {
             User storedUser = optionalUser.get();
-//            if (passwordEncoder.matches(ucp.getOldPassword(), storedUser.getPassword())) {
-                storedUser.setPassword(passwordEncoder.encode(ucp.getNewPassword()));
-//            }
+            if (passwordEncoder.matches(user.getOldPassword(), storedUser.getPassword())) {
+                storedUser.setPassword(passwordEncoder.encode(user.getNewPassword()));
+            }
             storedUser = userService.save(storedUser);
             storedUser.setPassword(null);
-            return Optional.of(storedUser);
+            return Optional.of(userToPojoMapper.convert(storedUser));
         }
-        throw new EntityNotFoundException(String.format(String.format("User with id %s is not found", idOrUserNameOrEmail)));
+        throw new EntityNotFoundException(String.format(String.format("User with id %s is not found", username)));
     }
 
     @RequestMapping(value = "/{idOrUserNameOrEmail}",
             method = RequestMethod.PATCH,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<User> patchUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail,
+    @AdminTenantAdminOrCurrentUserBodyPermission
+    public Optional<UserPojo> patchUser(@PathVariable("idOrUserNameOrEmail") String idOrUserNameOrEmail,
                                     @RequestBody User user) {
         Optional<User> optionalUser = userService.retrieveUser(idOrUserNameOrEmail);
         if (optionalUser.isPresent()) {
@@ -95,7 +101,7 @@ public class UserEndpoint {
             if (user.getPassword() != null) {
                 storedUser.setPassword(user.getPassword());
             }
-            return Optional.of(userService.save(storedUser));
+            return Optional.of(userToPojoMapper.convert(userService.save(storedUser)));
         }
         throw new EntityNotFoundException(String.format(String.format("User with id %s is not found", idOrUserNameOrEmail)));
     }

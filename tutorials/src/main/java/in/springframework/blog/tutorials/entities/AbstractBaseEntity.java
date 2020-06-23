@@ -2,6 +2,7 @@ package in.springframework.blog.tutorials.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -19,9 +20,9 @@ public abstract class AbstractBaseEntity {
   @GeneratedValue(strategy= GenerationType.AUTO)
   private Long id;
   @CreatedBy
-  private Long createdBy;
+  private String createdBy;
   @LastModifiedBy
-  private Long updatedBy;
+  private String updatedBy;
   @CreatedDate
   private Date createdAt;
   @LastModifiedDate

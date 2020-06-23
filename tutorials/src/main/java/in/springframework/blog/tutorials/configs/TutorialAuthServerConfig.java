@@ -1,5 +1,6 @@
 package in.springframework.blog.tutorials.configs;
 
+import in.springframework.blog.tutorials.services.TutorialClientDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +15,6 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -42,7 +42,9 @@ public class TutorialAuthServerConfig extends AuthorizationServerConfigurerAdapt
     endpoints.tokenStore(tokenStore())
             .accessTokenConverter(accessTokenConverter())
             .authenticationManager(authenticationManager)
-            .userDetailsService(userDetailsService);
+            .userDetailsService(userDetailsService)
+            .pathMapping("/oauth/token", "/{tenant}/oauth/token")
+            .pathMapping("/oauth/check_token", "/{tenant}/oauth/check_token");
   }
 
   @Override
@@ -57,9 +59,9 @@ public class TutorialAuthServerConfig extends AuthorizationServerConfigurerAdapt
 
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-    JdbcClientDetailsService jdbcClientDetailsService = new JdbcClientDetailsService(dataSource);
-    jdbcClientDetailsService.setPasswordEncoder(userPasswordEncoder());
-    clients.withClientDetails(jdbcClientDetailsService);
+    TutorialClientDetailsService tutorialClientDetailsService = new TutorialClientDetailsService();
+//    tutorialClientDetailsService.setPasswordEncoder(userPasswordEncoder());
+    clients.withClientDetails(tutorialClientDetailsService);
   }
 
   @Bean
@@ -82,5 +84,6 @@ public class TutorialAuthServerConfig extends AuthorizationServerConfigurerAdapt
   public PasswordEncoder userPasswordEncoder() {
     return new SCryptPasswordEncoder();
   }
+
 
 }

@@ -1,6 +1,7 @@
 package in.springframework.blog.tutorials.services;
 
-import in.springframework.blog.tutorials.entities.OauthClientDetails;
+import in.springframework.blog.tutorials.entities.TutorialClientDetails;
+import in.springframework.blog.tutorials.exceptions.EntityAlreadyExistsException;
 import in.springframework.blog.tutorials.exceptions.NotFoundException;
 import in.springframework.blog.tutorials.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,23 +18,36 @@ public class ClientService {
   @Autowired
   private PasswordEncoder passwordEncoder;
 
-  public Iterable<OauthClientDetails> findAll() {
+  public Iterable<TutorialClientDetails> findAll() {
     return clientRepository.findAll();
   }
 
-  public Optional<OauthClientDetails> findById(String clientId) {
+  public Optional<TutorialClientDetails> findById(String clientId) {
     return clientRepository.findById(clientId);
   }
 
-  public Optional<OauthClientDetails> update(String clientId, OauthClientDetails clientDetails) {
+  public Optional<TutorialClientDetails> create(TutorialClientDetails clientDetails) {
 
-    Optional<OauthClientDetails> optionalOauthClientDetails
+    Optional<TutorialClientDetails> optionalOauthClientDetails
+            = clientRepository.findById(clientDetails.getClientId());
+    if (optionalOauthClientDetails.isPresent()) {
+      throw new EntityAlreadyExistsException(String.format("%s is not a valid client id.", clientDetails.getClientId()));
+    }
+    clientDetails.setClientSecret(passwordEncoder.encode(clientDetails.getClientSecret()));
+    clientDetails = clientRepository.save(clientDetails);
+    return Optional.of(clientDetails);
+  }
+
+  public Optional<TutorialClientDetails> update(String clientId, TutorialClientDetails clientDetails) {
+
+    Optional<TutorialClientDetails> optionalOauthClientDetails
             = clientRepository.findById(clientId);
     if (!optionalOauthClientDetails.isPresent()) {
       throw new NotFoundException(String.format("%s is not a valid client id.", clientId));
     }
-    OauthClientDetails storedClientDetails = optionalOauthClientDetails.get();
+    TutorialClientDetails storedClientDetails = optionalOauthClientDetails.get();
     storedClientDetails.setClientSecret(passwordEncoder.encode(clientDetails.getClientSecret()));
     return Optional.of(clientRepository.save(storedClientDetails));
   }
+
 }

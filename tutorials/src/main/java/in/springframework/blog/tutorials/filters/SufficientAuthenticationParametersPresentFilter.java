@@ -14,14 +14,8 @@ public class SufficientAuthenticationParametersPresentFilter implements Filter {
                        ServletResponse response,
                        FilterChain chain) throws IOException, ServletException {
 
-    if (RequestContext.incomingUsername.get() != null) {
-      if (RequestContext.incomingPassword.get() == null && RequestContext.incomingToken.get() == null) {
-        throw new InsufficientAuthenticationParametersException(String.format("Either password or token should be present"));
-      }
-    }
-    else {
-
-      throw new InsufficientAuthenticationParametersException(String.format("Username is not present"));
+    if (RequestContext.currentTenant.get() == null) {
+      throw new InsufficientAuthenticationParametersException(String.format("Either password or token should be present"));
     }
     chain.doFilter(request, response);
   }

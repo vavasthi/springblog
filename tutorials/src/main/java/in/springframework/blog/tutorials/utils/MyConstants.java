@@ -1,6 +1,6 @@
 package in.springframework.blog.tutorials.utils;
 
-import in.springframework.blog.tutorials.pojos.Role;
+import org.springframework.core.Ordered;
 
 public class MyConstants {
 
@@ -63,4 +63,21 @@ public class MyConstants {
   public static final String DEFAULT_USER_FULLNAME = "Default User";
   public static final String DEFAULT_USER_PASSWORD = "default123";
   public static final String DEFAULT_USERNAME = "defaultuser";
+
+  public static final String BASE_ENDPOINT = "/{tenant}";
+  public static final String USER_ENDPOINT = BASE_ENDPOINT + "/user";
+  public static final String REGISTRATION_ENDPOINT = BASE_ENDPOINT + "/registration";
+
+  public static final String UNAUTHENTICATED_USER = "UnAuthenticated";
+
+  public enum GRANT_TYPES {
+    password,
+    authorization_code,
+    refresh_token,
+    client_credentials
+  }
+
+  public static final int TENANT_HEADER_PRECEDENCE = Ordered.HIGHEST_PRECEDENCE;
+  public static final int TENANT_PRECEDENCE = TENANT_HEADER_PRECEDENCE - 1;
+  public static final int USER_PRECEDENCE = TENANT_PRECEDENCE - 1;
 }

@@ -2,9 +2,10 @@ package in.springframework.blog.tutorials.services;
 
 import in.springframework.blog.tutorials.entities.User;
 import in.springframework.blog.tutorials.exceptions.NotFoundException;
+import in.springframework.blog.tutorials.pojos.Role;
 import in.springframework.blog.tutorials.pojos.TutorialGrantedAuthority;
 import in.springframework.blog.tutorials.pojos.TutorialUserDetails;
-import in.springframework.blog.tutorials.repositories.UserRepository;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,15 +19,17 @@ import java.util.Set;
 
 @Service
 @Transactional
+@Log4j2
 public class TutorialUserDetailService implements UserDetailsService {
 
   @Autowired
-  private UserRepository userRepository;
+  private UserService userService;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws NotFoundException {
-    Optional<User> user = userRepository.findUserByUsername(username);
-    if (user != null) {
+    log.error(String.format("%s looking for user.", username));
+    Optional<User> user = userService.retrieveUser(username);
+    if (user.isPresent()) {
       TutorialUserDetails userDetails = new TutorialUserDetails();
       userDetails.setUserName(user.get().getUsername());
       userDetails.setPassword(user.get().getPassword());
@@ -37,6 +40,17 @@ public class TutorialUserDetailService implements UserDetailsService {
       userDetails.setGrantedAuthorities(authorities);
       return userDetails;
     }
-    throw new NotFoundException(username);
+    else {
+
+      TutorialUserDetails userDetails = new TutorialUserDetails();
+      userDetails.setUserName(username);
+      userDetails.setPassword("NEWUSER");
+      Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+      for (String authority : user.get().getGrantedAuthorities()) {
+        authorities.add(new TutorialGrantedAuthority(Role.NEWUSER.name()));
+      }
+      userDetails.setGrantedAuthorities(authorities);
+      return userDetails;
+    }
   }
 }
