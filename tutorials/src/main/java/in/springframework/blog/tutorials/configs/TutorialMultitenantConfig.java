@@ -47,10 +47,6 @@ public class TutorialMultitenantConfig {
           prefix = "spring.datasource"
   )
   public DataSource dataSource() {
-/*    PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver
-            = new PathMatchingResourcePatternResolver();
-    Resource[] resources = pathMatchingResourcePatternResolver.getResources("tenants/*.properties");
-    Resource root = pathMatchingResourcePatternResolver.getResource("/");*/
     Map<Object, Object> resolvedDataSources = new HashMap<>();
     try {
       Resource[] resources = applicationContext.getResources(TENANT_PROPERTIES_RESOURCE);

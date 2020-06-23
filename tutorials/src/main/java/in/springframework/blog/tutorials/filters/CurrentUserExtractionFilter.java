@@ -3,7 +3,7 @@ package in.springframework.blog.tutorials.filters;
 import in.springframework.blog.tutorials.entities.User;
 import in.springframework.blog.tutorials.services.UserService;
 import in.springframework.blog.tutorials.utils.MyConstants;
-import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.utils.TutorialRequestContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,7 @@ public class CurrentUserExtractionFilter implements Filter {
       Optional<User> optionalUser = userService.findByUsername(username);
       if (optionalUser.isPresent()) {
 
-        RequestContext.currentUser.set(optionalUser.get());
+        TutorialRequestContext.currentUser.set(optionalUser.get());
       }
     }
     filterChain.doFilter(servletRequest, servletResponse);

@@ -1,7 +1,7 @@
 package in.springframework.blog.tutorials.filters;
 
 import in.springframework.blog.tutorials.exceptions.InsufficientAuthenticationParametersException;
-import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.utils.TutorialRequestContext;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class SufficientAuthenticationParametersPresentFilter implements Filter {
                        ServletResponse response,
                        FilterChain chain) throws IOException, ServletException {
 
-    if (RequestContext.currentTenant.get() == null) {
+    if (TutorialRequestContext.currentTenant.get() == null) {
       throw new InsufficientAuthenticationParametersException(String.format("Either password or token should be present"));
     }
     chain.doFilter(request, response);

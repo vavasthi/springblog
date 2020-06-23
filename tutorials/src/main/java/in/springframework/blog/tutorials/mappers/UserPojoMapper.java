@@ -2,7 +2,7 @@ package in.springframework.blog.tutorials.mappers;
 
 import in.springframework.blog.tutorials.entities.User;
 import in.springframework.blog.tutorials.pojos.UserPojo;
-import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.utils.TutorialRequestContext;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -37,7 +37,7 @@ public class UserPojoMapper {
   }
   public User convert(UserPojo userPojo) {
 
-    return new User(RequestContext.currentTenant.get(),
+    return new User(TutorialRequestContext.currentTenant.get(),
             userPojo.getFullname(),
             userPojo.getUsername(),
             userPojo.getEmail(),

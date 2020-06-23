@@ -78,6 +78,7 @@ public class MyConstants {
   }
 
   public static final int TENANT_HEADER_PRECEDENCE = Ordered.HIGHEST_PRECEDENCE;
-  public static final int TENANT_PRECEDENCE = TENANT_HEADER_PRECEDENCE - 1;
-  public static final int USER_PRECEDENCE = TENANT_PRECEDENCE - 1;
+  public static final int SEED_DATA_PRECEDENCE = TENANT_HEADER_PRECEDENCE - 1;
+  public static final int TENANT_PRECEDENCE = SEED_DATA_PRECEDENCE - 1;
+  public static final int USER_PRECEDENCE = Ordered.LOWEST_PRECEDENCE;
 }

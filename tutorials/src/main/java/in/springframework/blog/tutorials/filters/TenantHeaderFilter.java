@@ -2,7 +2,7 @@ package in.springframework.blog.tutorials.filters;
 
 import in.springframework.blog.tutorials.exceptions.InvalidTenantDiscriminatorException;
 import in.springframework.blog.tutorials.utils.MyConstants;
-import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.utils.TutorialRequestContext;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -44,7 +44,7 @@ public class TenantHeaderFilter implements Filter {
             = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
     String tenantDiscriminator = httpServletRequest.getHeader(TENANT_HEADER);
     if (tenantDiscriminatorInPath.equals(tenantDiscriminator)) {
-      RequestContext.currentTenantDiscriminator.set(tenantDiscriminator);
+      TutorialRequestContext.currentTenantDiscriminator.set(tenantDiscriminator);
       chain.doFilter(request, response);
     }
     else {

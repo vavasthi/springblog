@@ -4,7 +4,7 @@ import in.springframework.blog.tutorials.entities.Tenant;
 import in.springframework.blog.tutorials.entities.User;
 import in.springframework.blog.tutorials.repositories.TenantRepository;
 import in.springframework.blog.tutorials.repositories.UserRepository;
-import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.utils.TutorialRequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +21,10 @@ public class UserService {
     return userRepository.findAll();
   }
   public Optional<User> findByUsername(String username) {
-    return userRepository.findUserByTenantAndUsername(RequestContext.currentTenant.get(), username);
+    return userRepository.findUserByTenantAndUsername(TutorialRequestContext.currentTenant.get(), username);
   }
   public Optional<User> retrieveUser(String idOrUserNameOrEmail) {
-    Optional<Tenant> optionalTenant = tenantRepository.findById(RequestContext.currentTenant.get().getId());
+    Optional<Tenant> optionalTenant = tenantRepository.findById(TutorialRequestContext.currentTenant.get().getId());
     try {
       Long id = Long.parseLong(idOrUserNameOrEmail);
       Optional<User> optionalUser = userRepository.findById(id);

@@ -16,6 +16,9 @@ public class TenantService {
   @PersistenceContext
   private EntityManager entityManager;
 
+  public long count() {
+    return tenantRepository.count();
+  }
   public Iterable<Tenant> findAll() {
     return tenantRepository.findAll();
   }

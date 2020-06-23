@@ -8,7 +8,7 @@ import in.springframework.blog.tutorials.pojos.UserPojo;
 import in.springframework.blog.tutorials.services.ClientService;
 import in.springframework.blog.tutorials.services.UserService;
 import in.springframework.blog.tutorials.utils.MyConstants;
-import in.springframework.blog.tutorials.utils.RequestContext;
+import in.springframework.blog.tutorials.utils.TutorialRequestContext;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -39,7 +39,7 @@ public class RegistrationEndpoint {
                                          @RequestBody UserPojo userPojo) {
         User user = userToPojoMapper.convert(userPojo);
         user.setMask(Role.USER.getMask());
-        user.setTenant(RequestContext.currentTenant.get());
+        user.setTenant(TutorialRequestContext.currentTenant.get());
         user.setPassword(passwordEncoder.encode(userPojo.getPassword()));
         User storedUser = userService.save(user);
         storedUser.setPassword(null);
