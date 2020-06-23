@@ -1,6 +1,6 @@
 package in.springframework.blog.tutorials.configs;
 
-import in.springframework.blog.tutorials.Constants;
+import in.springframework.blog.tutorials.utils.MyConstants;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class SecondTopicProducerConfig {
     return new DefaultKafkaProducerFactory<>(configProps);
   }
 
-  @Bean(name = Constants.SECOND_TOPIC_TEMPLATE_NAME)
+  @Bean(name = MyConstants.SECOND_TOPIC_TEMPLATE_NAME)
   public KafkaTemplate<String, String> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
   }
