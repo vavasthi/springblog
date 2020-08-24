@@ -2,11 +2,17 @@ package in.springframework.blog.tutorials.services;
 
 import in.springframework.blog.tutorials.entities.Tenant;
 import in.springframework.blog.tutorials.entities.User;
+import in.springframework.blog.tutorials.mappers.UserPojoMapper;
+import in.springframework.blog.tutorials.pojos.Role;
+import in.springframework.blog.tutorials.pojos.UserPojo;
+import in.springframework.blog.tutorials.publishers.UserEventPublisher;
 import in.springframework.blog.tutorials.repositories.TenantRepository;
 import in.springframework.blog.tutorials.repositories.UserRepository;
 import in.springframework.blog.tutorials.utils.TutorialRequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -16,6 +22,12 @@ public class UserService {
   private UserRepository userRepository;
   @Autowired
   private TenantRepository tenantRepository;
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+  @Autowired
+  private UserPojoMapper userToPojoMapper;
+  @Autowired
+  private UserEventPublisher userEventPublisher;
 
   public Iterable<User> findAll() {
     return userRepository.findAll();
@@ -49,5 +61,17 @@ public class UserService {
 
   public void delete(Long id) {
     userRepository.deleteById(id);
+  }
+
+  @Transactional
+  public Optional<UserPojo> createUser(UserPojo userPojo) {
+    User user = userToPojoMapper.convert(userPojo);
+    user.setMask(Role.USER.getMask());
+    user.setTenant(TutorialRequestContext.currentTenant.get());
+    user.setPassword(passwordEncoder.encode(userPojo.getPassword()));
+    User storedUser = save(user);
+    storedUser.setPassword(null);
+    userEventPublisher.publishUserCreatedEvent(storedUser);
+    return Optional.of(userToPojoMapper.convert(storedUser));
   }
 }

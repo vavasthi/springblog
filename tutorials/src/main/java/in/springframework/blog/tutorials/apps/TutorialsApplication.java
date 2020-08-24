@@ -1,5 +1,6 @@
 package in.springframework.blog.tutorials.apps;
 
+import in.springframework.blog.tutorials.listeners.UserCreatedEventListener;
 import in.springframework.blog.tutorials.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +14,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 @EnableAutoConfiguration
 @EnableResourceServer
 public class TutorialsApplication {
+
+	@Autowired
+	private UserCreatedEventListener userCreatedEventListener;
 
 	@Autowired
 	private UserRepository userRepository;
