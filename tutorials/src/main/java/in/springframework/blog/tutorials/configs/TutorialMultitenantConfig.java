@@ -1,6 +1,11 @@
 package in.springframework.blog.tutorials.configs;
 
+import lombok.extern.log4j.Log4j2;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.FlywayException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ExitCodeGenerator;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -33,6 +38,7 @@ import java.util.Properties;
         transactionManagerRef =  "multiTransactionManager",
         basePackages = {"in.springframework.blog.tutorials.repositories"})
 @EntityScan(basePackages = {"in.springframework.blog.tutorials.entities"})
+@Log4j2
 public class TutorialMultitenantConfig {
 
   @Autowired
@@ -66,12 +72,12 @@ public class TutorialMultitenantConfig {
                   .url(tenantProperties.getProperty("spring.datasource.url"))
                   .username(tenantProperties.getProperty("spring.datasource.username"))
                   .password(tenantProperties.getProperty("spring.datasource.password"));
-
           if (dataSourceProperties.getType() != null) {
             dataSourceBuilder.type(dataSourceProperties.getType());
           }
-
-          resolvedDataSources.put(tenantId, dataSourceBuilder.build());
+          DataSource dataSource = dataSourceBuilder.build();
+          resolvedDataSources.put(tenantId, dataSource);
+          validateDatasource(dataSource);
         } catch (IOException e) {
           // Ooops, tenant could not be loaded. This is bad.
           // Stop the application!
@@ -113,8 +119,9 @@ public class TutorialMultitenantConfig {
     if(dataSourceProperties.getType() != null) {
       dataSourceBuilder.type(dataSourceProperties.getType());
     }
-
-    return dataSourceBuilder.build();
+    DataSource dataSource = dataSourceBuilder.build();
+    validateDatasource(dataSource);
+    return dataSource;
   }
 
   @Bean(name = "multiEntityManager")
@@ -150,5 +157,22 @@ public class TutorialMultitenantConfig {
     properties.put("hibernate.show_sql", true);
     properties.put("hibernate.format_sql", true);
     return properties;
+  }
+  private void validateDatasource(DataSource dataSource) {
+
+    try {
+
+      Flyway flyway = Flyway.configure().dataSource(dataSource).load();
+      flyway.validate();
+    }
+    catch (FlywayException fex) {
+      log.error("Schema  needs to be updated!", fex);
+      SpringApplication.exit(applicationContext, new ExitCodeGenerator() {
+        @Override
+        public int getExitCode() {
+          return 420;
+        }
+      });
+    }
   }
 }

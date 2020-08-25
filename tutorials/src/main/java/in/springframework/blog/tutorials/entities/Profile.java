@@ -17,4 +17,5 @@ public class Profile extends AbstractBaseEntity{
 
   private Long userId;
   private String photo;
+  private String maritalStatus;
 }

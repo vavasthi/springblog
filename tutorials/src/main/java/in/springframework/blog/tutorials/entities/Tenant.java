@@ -1,6 +1,5 @@
 package in.springframework.blog.tutorials.entities;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,6 +22,7 @@ public class Tenant extends AbstractBaseEntity{
   public Tenant() {
 
   }
+
   private String name;
   private String discriminator;
   private String description;

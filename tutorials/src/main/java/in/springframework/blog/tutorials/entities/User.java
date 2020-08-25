@@ -20,7 +20,6 @@ import java.util.Set;
         uniqueConstraints =
           {
                   @UniqueConstraint(name = "uq_email", columnNames = {"email"}),
-                  @UniqueConstraint(name = "uq_authToken", columnNames = {"authToken"}),
                   @UniqueConstraint(name = "uq_username", columnNames = {"username"})
           })
 @EntityListeners(AuditingEntityListener.class)
@@ -29,16 +28,16 @@ public class User implements Serializable {
     public User() {
 
     }
-    public User(Tenant tenant, String fullname, String username, String email, long mask, String authToken, Date expiry) {
+    public User(Tenant tenant, String fullname, String username, String email, long mask, Date expiry) {
         this.tenant = tenant;
         this.fullname = fullname;
         this.username = username;
         this.email = email;
         this.mask = mask;
-        this.authToken = authToken;
         this.expiry = expiry;
 
     }
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
@@ -58,7 +57,6 @@ public class User implements Serializable {
     private String password;
     private String email;
     private long mask;
-    private String authToken;
     private Date expiry;
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> grantedAuthorities;

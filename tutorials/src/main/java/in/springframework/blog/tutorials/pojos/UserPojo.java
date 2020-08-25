@@ -31,7 +31,6 @@ public class UserPojo implements Serializable {
     private String password;
     private String email;
     private long mask;
-    private String authToken;
     private Date expiry;
     private Set<String> grantedAuthorities;
 }

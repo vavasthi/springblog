@@ -31,7 +31,6 @@ public class UserPojoMapper {
             null,
             u.getEmail(),
             u.getMask(),
-            u.getAuthToken(),
             u.getExpiry(),
             u.getGrantedAuthorities());
   }
@@ -42,7 +41,6 @@ public class UserPojoMapper {
             userPojo.getUsername(),
             userPojo.getEmail(),
             userPojo.getMask(),
-            userPojo.getAuthToken(),
             userPojo.getExpiry());
   }
 }

@@ -16,8 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u where u.username=:username and u.tenant = :tenant")
     Optional<User> findUserByUsernameAndTenant(@Param("tenant") Tenant tenant,
                                                @Param("username") String username);
-    @Query("SELECT u FROM User u where u.authToken=:authToken")
-    Optional<User> findUserByAuthToken(@Param("authToken") String AuthToken);
     @Query("SELECT u FROM User u where u.tenant=:tenant and (u.username = :emailOrUsername or u.email = :emailOrUsername)")
     Optional<User> findUserByTenantAndUsername(@Param("tenant") Tenant tenant,
                                                @Param("emailOrUsername") String emailOrUsername);
